@@ -7,6 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add ConnectionString
 builder.Services.ConfigureDbContext(builder.Configuration);
 
+//Add Identity
+builder.Services.ConfigureIdentity();
+
+builder.Services.AddInfrastructureServices();
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -17,7 +21,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.MapScalarApiReference(opt =>
+    {
+        opt.Title = "Scalar API";
+        opt.Theme = ScalarTheme.BluePlanet;
+    });
 }
 
 app.UseHttpsRedirection();
