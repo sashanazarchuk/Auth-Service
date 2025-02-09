@@ -1,7 +1,9 @@
 ﻿using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Presentation.Extensions
+namespace Infrastructure.Extensions
 {
     public static class DbServiceExtension
     {

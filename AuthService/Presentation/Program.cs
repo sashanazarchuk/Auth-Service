@@ -1,6 +1,5 @@
 using Scalar.AspNetCore;
-using Presentation.Extensions;
-
+using Infrastructure.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
