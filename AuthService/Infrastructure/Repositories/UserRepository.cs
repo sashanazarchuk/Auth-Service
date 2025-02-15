@@ -18,18 +18,14 @@ namespace Infrastructure.Repositories
         {
             this.userManager = userManager;
         }
-        public async Task<IdentityResult> RegisterAsync(User user, string password)
+
+        public async Task<bool> EmailExistsAsync(string email)
         {
-            if (string.IsNullOrEmpty(user.Email))
-            {
-                return IdentityResult.Failed(new IdentityError { Code = "InvalidEmail", Description = "Email is required." });
-            }
+            return await userManager.FindByEmailAsync(email) != null;
+        }
 
-            var existingUser = await userManager.FindByEmailAsync(user.Email);
-
-            if (existingUser != null)
-                return IdentityResult.Failed(new IdentityError { Code = "DuplicateEmail", Description = "Email is already registered." });
-
+        public async Task<IdentityResult> CreateUserAsync(User user, string password)
+        {
             return await userManager.CreateAsync(user, password);
         }
     }

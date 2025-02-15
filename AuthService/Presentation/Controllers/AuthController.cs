@@ -19,7 +19,7 @@ namespace Presentation.Controllers
         [HttpPost("Registration")]
         public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
         {
-            var result = await service.RegisterAsync(model);
+            var result = await service.RegisterUserAsync(model);
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
