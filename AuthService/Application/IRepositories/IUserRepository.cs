@@ -10,6 +10,7 @@ namespace Application.IRepositories
 {
     public interface IUserRepository
     {
-        Task<IdentityResult> RegisterAsync(User user, string password);
+        Task<bool> EmailExistsAsync(string email);
+        Task<IdentityResult> CreateUserAsync(User user, string password);
     }
 }

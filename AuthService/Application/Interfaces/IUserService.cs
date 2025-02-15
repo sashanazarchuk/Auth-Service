@@ -10,7 +10,7 @@ namespace Application.Interfaces
 {
     public interface IUserService
     {
-        Task<IdentityResult> RegisterAsync(RegisterViewModel model);
+        Task<IdentityResult> RegisterUserAsync(RegisterViewModel model);
 
     }
 }
