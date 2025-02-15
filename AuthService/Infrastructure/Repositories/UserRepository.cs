@@ -18,7 +18,6 @@ namespace Infrastructure.Repositories
         {
             this.userManager = userManager;
         }
-
         public async Task<bool> EmailExistsAsync(string email)
         {
             return await userManager.FindByEmailAsync(email) != null;

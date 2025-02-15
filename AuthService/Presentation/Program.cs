@@ -1,5 +1,8 @@
 using Scalar.AspNetCore;
 using Infrastructure.Extensions;
+using Application.Validators;
+using FluentValidation;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -9,6 +12,9 @@ builder.Services.ConfigureDbContext(builder.Configuration);
 
 //Add Identity
 builder.Services.ConfigureIdentity();
+
+//Add Fluent Validation
+builder.Services.AddValidatorsFromAssembly(typeof(RegisterViewModelValidator).Assembly);
 
 builder.Services.AddInfrastructureServices();
 builder.Services.AddControllers();
