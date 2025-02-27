@@ -1,7 +1,9 @@
 ﻿using Application.Interfaces;
 using Application.IRepositories;
 using Application.Services;
+using Domain.Entities;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -17,6 +19,7 @@ namespace Infrastructure.Extensions
         {
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<UserManager<User>>();
         }
     }
 }

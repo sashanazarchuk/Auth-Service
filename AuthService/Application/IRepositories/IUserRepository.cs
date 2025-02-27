@@ -11,6 +11,5 @@ namespace Application.IRepositories
     public interface IUserRepository
     {
         Task<bool> EmailExistsAsync(string email);
-        Task<IdentityResult> CreateUserAsync(User user, string password);
     }
 }

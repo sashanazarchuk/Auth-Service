@@ -11,11 +11,13 @@ namespace Application.Services
     {
         public readonly IUserRepository repository;
         private readonly IValidator<RegisterViewModel> validator;
+        private readonly UserManager<User> userManager;
 
-        public UserService(IUserRepository repository, IValidator<RegisterViewModel> validator)
+        public UserService(IUserRepository repository, IValidator<RegisterViewModel> validator, UserManager<User> userManager)
         {
             this.repository = repository;
             this.validator = validator;
+            this.userManager = userManager;
         }
         public async Task<IdentityResult> RegisterUserAsync(RegisterViewModel model)
         {
@@ -27,6 +29,11 @@ namespace Application.Services
                 return IdentityResult.Failed(errors.ToArray());
             }
 
+            if (await repository.EmailExistsAsync(model.Email))
+            {
+                return IdentityResult.Failed(new IdentityError { Code = "DuplicateEmail", Description = "Email already in use." });
+            }
+
             var user = new User
             {
                 UserName = model.Email,
@@ -36,7 +43,7 @@ namespace Application.Services
                 Country = model.Country
             };
 
-            return await repository.CreateUserAsync(user, model.Password);
+            return await userManager.CreateAsync(user, model.Password);
         }
     }
 }

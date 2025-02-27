@@ -1,6 +1,8 @@
 ﻿using Application.IRepositories;
 using Domain.Entities;
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -12,20 +14,15 @@ namespace Infrastructure.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly UserManager<User> userManager;
+        private readonly AuthDbContext context;
 
-        public UserRepository(UserManager<User> userManager)
+        public UserRepository(AuthDbContext context)
         {
-            this.userManager = userManager;
+             this.context = context;
         }
         public async Task<bool> EmailExistsAsync(string email)
         {
-            return await userManager.FindByEmailAsync(email) != null;
-        }
-
-        public async Task<IdentityResult> CreateUserAsync(User user, string password)
-        {
-            return await userManager.CreateAsync(user, password);
+            return await context.Users.AnyAsync(u => u.Email == email);
         }
     }
 }
