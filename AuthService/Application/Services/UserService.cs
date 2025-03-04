@@ -12,13 +12,17 @@ namespace Application.Services
         public readonly IUserRepository repository;
         private readonly IValidator<RegisterViewModel> validator;
         private readonly UserManager<User> userManager;
+        private readonly IJwtTokenService jwtService;
 
-        public UserService(IUserRepository repository, IValidator<RegisterViewModel> validator, UserManager<User> userManager)
+        public UserService(IUserRepository repository, IValidator<RegisterViewModel> validator, UserManager<User> userManager, IJwtTokenService jwtService)
         {
             this.repository = repository;
-            this.validator = validator;
             this.userManager = userManager;
+            this.validator = validator;
+            this.jwtService = jwtService;
         }
+
+
         public async Task<IdentityResult> RegisterUserAsync(RegisterViewModel model)
         {
 
@@ -44,6 +48,27 @@ namespace Application.Services
             };
 
             return await userManager.CreateAsync(user, model.Password);
+        }
+
+
+        public async Task<string> Login(LoginViewModel model)
+        {
+        
+            var user = await userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid email or password");
+            }
+
+       
+            var isPasswordValid = await userManager.CheckPasswordAsync(user, model.Password);
+            if (!isPasswordValid)
+            {
+                throw new InvalidOperationException("Invalid email or password");
+            }
+
+           
+            return jwtService.CreateToken(user);
         }
     }
 }
