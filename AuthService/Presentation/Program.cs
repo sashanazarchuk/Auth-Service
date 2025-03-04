@@ -13,6 +13,9 @@ builder.Services.ConfigureDbContext(builder.Configuration);
 //Add Identity
 builder.Services.ConfigureIdentity();
 
+//Add Jwt Settings
+builder.Services.JwtSetting(builder.Configuration);
+
 //Add Fluent Validation
 builder.Services.AddValidatorsFromAssembly(typeof(RegisterViewModelValidator).Assembly);
 
@@ -36,6 +39,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

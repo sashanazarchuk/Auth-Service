@@ -12,5 +12,6 @@ namespace Application.Interfaces
     {
         Task<IdentityResult> RegisterUserAsync(RegisterViewModel model);
 
+        Task<string> Login(LoginViewModel model);
     }
 }
