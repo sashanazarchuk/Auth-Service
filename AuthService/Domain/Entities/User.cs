@@ -6,5 +6,7 @@ namespace Domain.Entities
     {
         public int Age { get; set; }
         public string Country { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
     }
 }

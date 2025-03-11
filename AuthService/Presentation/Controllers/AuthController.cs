@@ -3,6 +3,8 @@ using Application.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Authentication;
+using System.Security.Claims;
 
 namespace Presentation.Controllers
 {
@@ -37,14 +39,28 @@ namespace Presentation.Controllers
                 var token = await service.Login(model);
                 return Ok(token);
             }
-            catch (InvalidOperationException ex)
+            catch (AuthenticationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return Unauthorized(new { message = ex.Message });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
             }
+        }
+
+ 
+        [HttpPost("Revoke"), Authorize]
+        public async Task<IActionResult> Revoke()
+        {
+            var userId = User.FindFirstValue("userId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User not found");
+            }
+
+            await service.RevokeToken(userId);
+            return NoContent();
         }
     }
 }

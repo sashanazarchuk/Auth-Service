@@ -20,7 +20,7 @@ namespace Infrastructure.Extensions
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<UserManager<User>>();
-            services.AddScoped<IJwtTokenService, JwtTokenService>();
+            services.AddTransient<IJwtTokenService, JwtTokenService>();
         }
     }
 }

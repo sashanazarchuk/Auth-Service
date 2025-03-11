@@ -1,4 +1,5 @@
-﻿using Application.Models;
+﻿using Application.DTOs;
+using Application.Models;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace Application.Interfaces
     public interface IUserService
     {
         Task<IdentityResult> RegisterUserAsync(RegisterViewModel model);
-
-        Task<string> Login(LoginViewModel model);
+        Task<TokenDto> Login(LoginViewModel model);
+        Task RevokeToken(string userId);
     }
 }
