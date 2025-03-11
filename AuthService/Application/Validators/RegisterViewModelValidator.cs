@@ -17,7 +17,7 @@ namespace Application.Validators
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("This field is required")
                 .EmailAddress().WithMessage("Invalid email format")
-                .MustAsync(async (email, cancellation) => !await userRepository.EmailExistsAsync(email))
+                .MustAsync(async (email, cancellation) => !await userRepository.IsEmailExistsAsync(email))
                 .WithMessage("Email is already registered.");
 
             RuleFor(x => x.PhoneNumber)

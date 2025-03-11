@@ -1,23 +1,23 @@
-﻿using Application.Interfaces;
+﻿using Application.DTOs;
+using Application.Interfaces;
 using Application.IRepositories;
 using Application.Models;
 using Domain.Entities;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Authentication;
 
 namespace Application.Services
 {
     public class UserService : IUserService
     {
-        public readonly IUserRepository repository;
+        private readonly IUserRepository repository;
         private readonly IValidator<RegisterViewModel> validator;
-        private readonly UserManager<User> userManager;
         private readonly IJwtTokenService jwtService;
 
-        public UserService(IUserRepository repository, IValidator<RegisterViewModel> validator, UserManager<User> userManager, IJwtTokenService jwtService)
+        public UserService(IUserRepository repository, IValidator<RegisterViewModel> validator, IJwtTokenService jwtService)
         {
             this.repository = repository;
-            this.userManager = userManager;
             this.validator = validator;
             this.jwtService = jwtService;
         }
@@ -33,7 +33,7 @@ namespace Application.Services
                 return IdentityResult.Failed(errors.ToArray());
             }
 
-            if (await repository.EmailExistsAsync(model.Email))
+            if (await repository.IsEmailExistsAsync(model.Email))
             {
                 return IdentityResult.Failed(new IdentityError { Code = "DuplicateEmail", Description = "Email already in use." });
             }
@@ -47,28 +47,54 @@ namespace Application.Services
                 Country = model.Country
             };
 
-            return await userManager.CreateAsync(user, model.Password);
+            return await repository.CreateUserAsync(user, model.Password);
         }
 
 
-        public async Task<string> Login(LoginViewModel model)
+        public async Task<TokenDto> Login(LoginViewModel model)
         {
-        
-            var user = await userManager.FindByEmailAsync(model.Email);
+
+            var user = await repository.FindUserByEmailAsync(model.Email);
             if (user == null)
             {
-                throw new InvalidOperationException("Invalid email or password");
+                throw new AuthenticationException("Invalid email or password");
             }
 
-       
-            var isPasswordValid = await userManager.CheckPasswordAsync(user, model.Password);
+
+            var isPasswordValid = await repository.ValidatePasswordAsync(user, model.Password);
             if (!isPasswordValid)
             {
-                throw new InvalidOperationException("Invalid email or password");
+                throw new AuthenticationException("Invalid email or password");
             }
 
-           
-            return jwtService.CreateToken(user);
+            var jwtToken = jwtService.CreateAccessToken(user);
+            var refreshToken = jwtService.GenerateRefreshToken();
+
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            await repository.UpdateUserAsync(user);
+
+            return new TokenDto
+            {
+                AccessToken = jwtToken,
+                RefreshToken = refreshToken
+            };
+        }
+
+
+        public async Task RevokeToken(string userId)
+        {
+            var user = await repository.FindUserByIdAsync(userId);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found");
+            }
+
+            user.RefreshToken = null;
+            user.RefreshTokenExpiryTime = null;
+
+            await repository.UpdateUserAsync(user);
         }
     }
 }
